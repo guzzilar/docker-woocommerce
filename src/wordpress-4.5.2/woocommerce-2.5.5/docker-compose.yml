@@ -1,0 +1,18 @@
+version: '2'
+services:
+  wp452_woocommerce255:
+    build: .
+    command: -- ./wordpress-4.5.2-woocommerce-2.5.5-install.sh
+    links:
+      - wp452_woocommerce255_db
+    ports:
+      - 8080:80
+    volumes:
+      - .:/var/www/html/wordpress-4.5.2/woocommerce-2.5.5
+    entrypoint: ./wait-for-it.sh wp452_woocommerce255_db:3306
+
+  wp452_woocommerce255_db:
+    image: mysql
+    environment:
+      MYSQL_DATABASE: wp452_woocommerce255_db
+      MYSQL_ROOT_PASSWORD: root
