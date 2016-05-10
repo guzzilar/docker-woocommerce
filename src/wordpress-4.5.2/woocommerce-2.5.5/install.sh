@@ -19,6 +19,30 @@ rm wordpress-4.5.2.zip
 mv ./_build/wordpress/* ./_build/.
 rm -R ./_build/wordpress
 
+cd ./_build
+
+wp core config \
+    --allow-root \
+    --skip-check \
+    --dbhost=wp452_woocommerce255_db \
+    --dbname=wp452_woocommerce255_db \
+    --dbuser=root \
+    --dbpass=root \
+    --extra-php <<PHP
+        define( 'WP_DEBUG', true );
+        define( 'WP_DEBUG_LOG', true );
+PHP
+
+wp core install \
+    --allow-root \
+    --url=http://192.168.99.100:8080/wordpress-4.5.2/woocommerce-2.5.5/_build \
+    --title=WooCommerce \
+    --admin_user=admin \
+    --admin_password=admin \
+    --admin_email=iam.nuttanon@gmail.com
+
+cd ../
+
 chown -R www-data:www-data .
 
 apache2 -D FOREGROUND
