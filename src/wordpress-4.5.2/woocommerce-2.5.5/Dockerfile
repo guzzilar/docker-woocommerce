@@ -3,7 +3,9 @@ FROM php:5.6-apache
 RUN usermod -u 1000 www-data
 
 RUN apt-get update && apt-get install -y \
-        unzip
+        unzip \
+
+    && docker-php-ext-install mysql
 
 # WAIT-FOR-IT.sh
 ADD ./wait-for-it.sh ./wait-for-it.sh

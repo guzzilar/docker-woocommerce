@@ -9,12 +9,12 @@ rm -R ./_build
 mkdir ./_build
 
 # DEPLOY
-# curl -O https://wordpress.org/wordpress-4.5.1.zip
-# unzip -q wordpress-4.5.1.zip -d ./_build
-# rm wordpress-4.5.1.zip
+curl -O https://wordpress.org/wordpress-4.5.2.zip
+unzip -q wordpress-4.5.2.zip -d ./_build
+rm wordpress-4.5.2.zip
 
 # TEST
-unzip -q ./_resources/wordpress-4.5.1.zip -d ./_build
+# unzip -q ./_resources/wordpress-4.5.2.zip -d ./_build
 
 mv ./_build/wordpress/* ./_build/.
 rm -R ./_build/wordpress
