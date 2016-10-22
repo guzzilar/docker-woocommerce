@@ -1,9 +1,5 @@
 #!/bin/sh
 
-###
-# OpenCart 1.5.6.4 directory: /var/www/html/wordpress-4.5.2/woocommerce-2.5.5
-# Build directory:            /var/www/html/wordpress-4.5.2/woocommerce-2.5.5/_build
-###
 cd ./wordpress-4.5.2/woocommerce-2.5.5
 rm -R ./_build
 mkdir ./_build
@@ -24,8 +20,8 @@ cd ./_build
 wp core config \
     --allow-root \
     --skip-check \
-    --dbhost=wp452_woocommerce255_db \
-    --dbname=wp452_woocommerce255_db \
+    --dbhost=mysql \
+    --dbname=www \
     --dbuser=root \
     --dbpass=root \
     --extra-php <<PHP
@@ -35,7 +31,7 @@ PHP
 
 wp core install \
     --allow-root \
-    --url=http://192.168.99.100:8080/wordpress-4.5.2/woocommerce-2.5.5/_build \
+    --url=http://192.168.99.100/wordpress-4.5.2/woocommerce-2.5.5/_build \
     --title=WooCommerce \
     --admin_user=admin \
     --admin_password=admin \
