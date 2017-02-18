@@ -1,2 +1,3 @@
-# docker-woocommerce
-Docker for WooCommerce
+# Docker WooCommerce
+Just type `bin/build --target=latest`
+
