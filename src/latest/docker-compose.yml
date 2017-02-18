@@ -2,14 +2,13 @@ version: '2'
 services:
   php:
     build: .
-    command: -- ./install.sh
+    command: ["/var/www/bin/wait-for-it", "-t", "60", "mysql:3306", "--", "/var/www/bin/install"]
     ports:
       - "80:80"
     depends_on:
       - mysql
-    entrypoint: ./wait-for-it.sh mysql:3306
     volumes:
-      - .:/var/www/html/wordpress-4.6.1/woocommerce-2.6.6
+      - ./html:/var/www/html
 
   mysql:
     image: mysql

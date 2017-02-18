@@ -1,19 +1,15 @@
 #!/bin/sh
+a2enmod rewrite
 
-cd ./wordpress-4.5.3/woocommerce-2.6.4
-rm -R ./_build
-mkdir ./_build
+# Download the latest WordPress.
+curl -O https://wordpress.org/latest.zip
+unzip latest.zip
+rm latest.zip
 
-# DEPLOY
-curl -O https://wordpress.org/wordpress-4.5.3.zip
-unzip -q wordpress-4.5.3.zip -d ./_build
-rm wordpress-4.5.3.zip
+mv ./wordpress/* .
+rm -R ./wordpress
 
-mv ./_build/wordpress/* ./_build/.
-rm -R ./_build/wordpress
-
-cd ./_build
-
+# Config
 wp core config \
     --allow-root \
     --skip-check \
@@ -28,15 +24,15 @@ PHP
 
 wp core install \
     --allow-root \
-    --url=http://192.168.99.100/wordpress-4.5.3/woocommerce-2.6.4/_build \
+    --url=http://127.0.0.1 \
     --title=OmiseWooCommerce \
     --admin_user=admin \
     --admin_password=admin \
     --admin_email=iam.nuttanon@gmail.com
 
-cd ../
+wp plugin install woocommerce --allow-root --activate 
+wp plugin install omise --allow-root --activate 
 
-chown -R www-data:www-data .
+chown -R www-data:www-data /var/www/html
 
 apache2 -D FOREGROUND
-
