@@ -1,16 +1,17 @@
 version: '2'
 services:
-  php:
+  www:
     build: .
-    command: ["/var/www/bin/wait-for-it", "-t", "60", "mysql:3306", "--", "/var/www/bin/install"]
+    image: woocommerce:latest
+    command: ["/var/www/bin/wait-for-it", "-t", "60", "db:3306", "--", "/var/www/bin/install"]
     ports:
       - "80:80"
     depends_on:
-      - mysql
+      - db
     volumes:
       - ./html:/var/www/html
 
-  mysql:
+  db:
     image: mysql
     ports:
       - "3306:3306"

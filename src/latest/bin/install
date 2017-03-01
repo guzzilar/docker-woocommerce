@@ -3,7 +3,7 @@ a2enmod rewrite
 
 # Download the latest WordPress.
 curl -O https://wordpress.org/latest.zip
-unzip latest.zip
+unzip -q latest.zip
 rm latest.zip
 
 mv ./wordpress/* .
@@ -13,7 +13,7 @@ rm -R ./wordpress
 wp core config \
     --allow-root \
     --skip-check \
-    --dbhost=mysql \
+    --dbhost=db \
     --dbname=www \
     --dbuser=root \
     --dbpass=root \

@@ -1,0 +1,116 @@
+#!/bin/bash
+build=0
+build_image=0
+build_source=""
+build_version=""
+
+##
+# Show the usage of Docky.
+##
+doc() {
+    echo -e 'usage: build [--target=<version>]'
+    echo -e ''
+    echo -e 'To build the specific version, please use the following command.'
+    echo -e '  --target\tSpecify the target version that you want to build'
+    echo -e ''
+    echo -e 'The following versions are the version that this Docker supported'
+    echo -e '  latest'
+}
+
+##
+# Start it!
+##
+start() {
+    # Prepare platform source file if --source has specified
+    local build_dir=./src/$build_version
+
+    docker-compose -f $build_dir/docker-compose.yml start
+}
+
+##
+# Build it!
+##
+build() {
+    # Prepare platform source file if --source has specified
+    local build_dir=./src/$build_version
+    local build_dir_tmp=$build_dir/tmp
+
+    mkdir $build_dir_tmp
+
+    [[ -n $build_source ]] && { 
+        cp $build_source $build_dir_tmp/platform.zip
+    }
+
+    docker-compose -f $build_dir/docker-compose.yml stop
+    docker-compose -f $build_dir/docker-compose.yml rm -f www
+    docker-compose -f $build_dir/docker-compose.yml rm -f db
+
+    if [ $build_image -eq 1 ]; then
+        docker-compose -f $build_dir/docker-compose.yml up --build
+    else
+        docker-compose -f $build_dir/docker-compose.yml up
+    fi
+}
+
+# Reading arguments.
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -h | --help)
+            doc
+            exit
+            shift
+            ;;
+
+        --source=*)
+            build_source="${1#*=}"
+            shift
+            ;;
+
+        --build)
+            build=1
+            shift
+            ;;
+
+        --re-build)
+            build=1
+            build_image=1
+            shift
+            ;;
+
+        # Deprecated, uses --version instead.
+        --target*)
+            build_version=`echo $1 | sed -e 's/^[^=]*=//g'`
+            shift
+            ;;
+
+        *)
+            [[ -z $build_version ]] && {
+                if [ ! -d ./src/$1 ]; then
+                    echo "error: build version \"$1\" did not match with any version(s) we supported."
+                    exit
+                fi
+
+                build_version=$1
+            }
+            shift
+            ;;
+    esac
+done
+
+# Check if build-version is specified.
+# If not, set to "latest".
+[[ ! -n $build_version ]] && { 
+    build_version="latest"
+
+    if [ ! -d ./src/$build_version ]; then
+        echo "error: build version \"$build_version\" did not match with any version(s) we supported."
+        exit
+    fi
+}
+
+# Execute "build" function
+if [ $build -eq 1 ]; then
+    build
+else
+    start
+fi

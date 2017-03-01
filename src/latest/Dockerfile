@@ -1,5 +1,5 @@
 FROM php:5.6-apache
-MAINTAINER Guzzilar
+LABEL maintainer "Guzzilar"
 
 RUN usermod -u 1000 www-data
 
@@ -29,5 +29,7 @@ ENV APACHE_RUN_DIR /var/run/apache2
 ENV APACHE_LOCK_DIR /var/lock/apache2
 
 RUN mkdir -p $APACHE_RUN_DIR $APACHE_LOCK_DIR $APACHE_LOG_DIR
+
+COPY ./tmp /tmp/building/
 
 EXPOSE 80
