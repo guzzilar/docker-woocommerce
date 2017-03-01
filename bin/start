@@ -1,4 +1,6 @@
 #!/bin/bash
+SRC_DIR=$(dirname $0)/../src
+
 build=0
 build_image=0
 build_source=""
@@ -23,7 +25,7 @@ doc() {
 ##
 start() {
     # Prepare platform source file if --source has specified
-    local build_dir=./src/$build_version
+    local build_dir=$SRC_DIR/$build_version
 
     docker-compose -f $build_dir/docker-compose.yml start
 }
@@ -33,7 +35,7 @@ start() {
 ##
 build() {
     # Prepare platform source file if --source has specified
-    local build_dir=./src/$build_version
+    local build_dir=$SRC_DIR/$build_version
     local build_dir_tmp=$build_dir/tmp
 
     if [ $build_from_scratch -eq 1 ]; then
@@ -96,7 +98,7 @@ while [[ $# -gt 0 ]]; do
 
         *)
             [[ -z $build_version ]] && {
-                if [ ! -d ./src/$1 ]; then
+                if [ ! -d $SRC_DIR/$1 ]; then
                     echo "error: build version \"$1\" did not match with any version(s) we supported."
                     exit
                 fi
@@ -113,7 +115,7 @@ done
 [[ ! -n $build_version ]] && { 
     build_version="latest"
 
-    if [ ! -d ./src/$build_version ]; then
+    if [ ! -d $SRC_DIR/$build_version ]; then
         echo "error: build version \"$build_version\" did not match with any version(s) we supported."
         exit
     fi
