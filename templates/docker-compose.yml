@@ -1,0 +1,19 @@
+version: '2'
+services:
+  www:
+    build: .
+    command: ["/var/www/bin/wait-for-it", "-t", "60", "db:3306", "--", "/var/www/bin/install"]
+    ports:
+      - "80:80"
+    depends_on:
+      - db
+    volumes:
+      - ./html:/var/www/html
+
+  db:
+    image: mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: www
+      MYSQL_ROOT_PASSWORD: root

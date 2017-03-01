@@ -1,0 +1,7 @@
+#!/bin/bash
+a2enmod rewrite
+
+# Remove temporary files once finish building process.
+rm -R /tmp/building
+
+apache2 -D FOREGROUND
