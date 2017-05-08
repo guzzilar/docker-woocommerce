@@ -4,7 +4,10 @@ LABEL maintainer "Guzzilar"
 RUN usermod -u 1000 www-data
 
 RUN apt-get update && apt-get install -y --force-yes \
-    unzip
+    unzip \
+    mysql-client \
+    mysql-server \
+    && rm -rf /var/lib/apt
 
 RUN docker-php-ext-install mysqli
 
