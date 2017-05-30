@@ -1,27 +1,27 @@
 #!/bin/sh
-a2enmod rewrite
+
+echo "Create Database"
+service mysql start
+mysqladmin -h localhost -P 3306 -u root -proot create www --force 2> /dev/null;
 
 # Download the latest WordPress.
-curl -O https://wordpress.org/latest.zip
-unzip -q latest.zip
-rm latest.zip
-
-mv ./wordpress/* .
-rm -R ./wordpress
+wp core download --allow-root
 
 # Config
 wp core config \
     --allow-root \
     --skip-check \
-    --dbhost=db \
+    --dbhost=127.0.0.1 \
     --dbname=www \
     --dbuser=root \
     --dbpass=root \
     --extra-php <<PHP
-        define( 'WP_DEBUG', true );
-        define( 'WP_DEBUG_LOG', true );
+define( 'WP_DEBUG', true );
+define( 'WP_DEBUG_LOG', true );
+define( 'FS_METHOD', 'direct' );
 PHP
 
+# Install
 wp core install \
     --allow-root \
     --url=http://127.0.0.1 \
@@ -30,8 +30,8 @@ wp core install \
     --admin_password=admin \
     --admin_email=iam.nuttanon@gmail.com
 
-wp plugin install woocommerce --allow-root --activate 
-wp plugin install omise --allow-root --activate 
+# Install WooCommerce
+wp plugin install woocommerce --allow-root --activate
 
 chown -R www-data:www-data /var/www/html
 
