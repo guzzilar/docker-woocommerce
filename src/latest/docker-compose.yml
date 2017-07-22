@@ -1,4 +1,4 @@
-version: '2'
+version: '3'
 services:
   www:
     build: .
@@ -8,3 +8,5 @@ services:
       - "80:80"
     volumes:
       - ./html:/var/www/html
+    env_file:
+      - default.env

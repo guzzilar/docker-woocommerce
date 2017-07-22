@@ -3,6 +3,7 @@ SRC_DIR=$(dirname $0)/../src
 
 DOCKY_EXECUTABLE_COMMANDS=("doc" "up" "build")
 
+build_env_file=""
 build_location=""
 build_version=""
 arg_position=0
@@ -59,6 +60,10 @@ prepareBuildLocation () {
 up () {
     prepareBuildLocation
 
+    [[ ! -z $build_env_file ]] && {
+        sed -i '' -e "s/default.env/${build_env_file}/g" $build_location/docker-compose.yml
+    }
+
     docker-compose -f $build_location/docker-compose.yml up
 }
 
@@ -68,7 +73,11 @@ up () {
 build () {
     prepareBuildLocation
 
-    docker-compose -f $build_location/docker-compose.yml build
+    [[ ! -z $build_env_file ]] && {
+        sed -i '' -e "s/default.env/${build_env_file}/g" $build_location/docker-compose.yml
+    }
+
+    docker-compose -f $build_location/docker-compose.yml up --build
 }
 
 
@@ -95,6 +104,11 @@ while [[ $# -gt 0 ]]; do
         -h | --help)
             doc
             exit
+            ;;
+
+        --env-file=*)
+            build_env_file="${1#*=}"
+            shift
             ;;
 
         *)
