@@ -1,5 +1,6 @@
 **/_*
 *.zip
+*.env
 **/.DS_Store
 **/*/html/*
 !**/*/html/.gitkeep
