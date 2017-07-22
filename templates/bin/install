@@ -1,7 +1,11 @@
-#!/bin/bash
-a2enmod rewrite
+#!/bin/sh
 
-# Remove temporary files once finish building process.
-rm -R /tmp/building
+echo "Create Database"
+service mysql start
+mysqladmin -h localhost -P 3306 -u root -proot create www --force 2> /dev/null;
+
+# ...
+
+chown -R www-data:www-data /var/www/html
 
 apache2 -D FOREGROUND
