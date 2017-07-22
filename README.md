@@ -8,6 +8,7 @@ Docker-WooCommerce helps you easily run up a WooCommerce application (can be use
 ### Supported Versions
 
 - latest
+- 2.6.14
 
 **Can't find the version you're looking for?**  
 Just contribute by yourself! 😛  
