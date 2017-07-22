@@ -1,64 +1,93 @@
 #!/bin/bash
 SRC_DIR=$(dirname $0)/../src
 
-build=0
-build_image=0
-build_source=""
+DOCKY_EXECUTABLE_COMMANDS=("doc" "up" "build")
+
+build_location=""
 build_version=""
-build_from_scratch=0
+arg_position=0
 
-##
-# Show the usage of Docky.
-##
+the_command=""
+
+###
+ # Docker-WooCommerce's document
+ ##
 doc() {
-    echo -e 'usage: build [--target=<version>]'
+    echo -e "Docky Document:"
+    echo -e "---------------"
+    echo -e 'usage: ./bin/start [<command>] [<version>] [<build_location>(optional)]'
     echo -e ''
-    echo -e 'To build the specific version, please use the following command.'
-    echo -e '  --target\tSpecify the target version that you want to build'
-    echo -e ''
-    echo -e 'The following versions are the version that this Docker supported'
-    echo -e '  latest'
+    echo -e 'The following parameters are the version that you can assign to the second argument'
+    echo -e '\tlatest'
 }
 
-##
-# Start it!
-##
-start() {
-    # Prepare platform source file if --source has specified
-    local build_dir=$SRC_DIR/$build_version
 
-    docker-compose -f $build_dir/docker-compose.yml start
+###
+ # Check if Docky supports a build target platform.
+ #
+ # @param $1 string  name of a platform you want to check
+ ##
+canExecute () {
+    local the_command
+
+    for the_command in ${DOCKY_EXECUTABLE_COMMANDS[@]}; do
+        [[ $the_command == $1 ]] && {
+            return 0
+        }
+    done
+
+    return 1
 }
 
-##
-# Build it!
-##
-build() {
-    # Prepare platform source file if --source has specified
-    local build_dir=$SRC_DIR/$build_version
-    local build_dir_tmp=$build_dir/tmp
+prepareBuildLocation () {
+    local _build_location=$([[ ! -z $build_location ]] && echo $build_location || echo $SRC_DIR/$build_version)
 
-    if [ $build_from_scratch -eq 1 ]; then
-        rm -R $build_dir/html
-        rm -R $build_dir/tmp
+    if [ $_build_location != $SRC_DIR/$build_version ]; then
+        echo "Creating a new folder at $_build_location"
+        mkdir -p $_build_location
+
+        echo "Copying build files from $SRC_DIR/$build_version/* to $_build_location/"
+        cp -R $SRC_DIR/$build_version/* $_build_location/
     fi
 
-    mkdir $build_dir_tmp
-
-    [[ -n $build_source ]] && { 
-        cp $build_source $build_dir_tmp/platform.zip
-    }
-
-    docker-compose -f $build_dir/docker-compose.yml stop
-    docker-compose -f $build_dir/docker-compose.yml rm -f www
-    docker-compose -f $build_dir/docker-compose.yml rm -f db
-
-    if [ $build_image -eq 1 ]; then
-        docker-compose -f $build_dir/docker-compose.yml up --build
-    else
-        docker-compose -f $build_dir/docker-compose.yml up
-    fi
+    build_location=$_build_location
 }
+
+###
+ # Start the container.
+ ##
+up () {
+    prepareBuildLocation
+
+    docker-compose -f $build_location/docker-compose.yml up
+}
+
+###
+ # Build the container.
+ ##
+build () {
+    prepareBuildLocation
+
+    docker-compose -f $build_location/docker-compose.yml build
+}
+
+
+# ..
+#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-
+# EXECUTION AREA
+#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-
+# ..
+the_command=$1
+if ! canExecute $the_command; then
+    echo ".."
+    echo "Docky: error, cannot execute \"$the_command\"."
+    echo ""
+    doc
+    exit
+fi
+
+# Remove "execute command" from arguments.
+shift
 
 # Reading arguments.
 while [[ $# -gt 0 ]]; do
@@ -66,46 +95,28 @@ while [[ $# -gt 0 ]]; do
         -h | --help)
             doc
             exit
-            shift
-            ;;
-
-        --source=*)
-            build_source="${1#*=}"
-            shift
-            ;;
-
-        --build)
-            build=1
-            shift
-            ;;
-
-        --re-build)
-            build=1
-            build_image=1
-            shift
-            ;;
-
-        --remove-files)
-            build_from_scratch=1
-            shift
-            ;;
-
-        # Deprecated, uses --version instead.
-        --target*)
-            build_version=`echo $1 | sed -e 's/^[^=]*=//g'`
-            shift
             ;;
 
         *)
             [[ -z $build_version ]] && {
                 if [ ! -d $SRC_DIR/$1 ]; then
-                    echo "error: build version \"$1\" did not match with any version(s) we supported."
+                    echo "Docky: error, build version \"$1\" did not match with any version(s) we supported."
                     exit
                 fi
 
                 build_version=$1
+                arg_position=1
+
+                shift
+                continue
             }
-            shift
+
+            [[ $arg_position -eq 1 ]] && {
+                build_location=$1
+
+                shift
+                continue
+            }
             ;;
     esac
 done
@@ -113,17 +124,12 @@ done
 # Check if build-version is specified.
 # If not, set to "latest".
 [[ ! -n $build_version ]] && { 
-    build_version="latest"
+    echo ".."
+    echo "Docky: error, \"build version\" is required."
+    echo ""
 
-    if [ ! -d $SRC_DIR/$build_version ]; then
-        echo "error: build version \"$build_version\" did not match with any version(s) we supported."
-        exit
-    fi
+    doc
+    exit
 }
 
-# Execute "build" function
-if [ $build -eq 1 ]; then
-    build
-else
-    start
-fi
+$the_command
