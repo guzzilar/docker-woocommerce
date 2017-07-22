@@ -61,7 +61,7 @@ up () {
     prepareBuildLocation
 
     [[ ! -z $build_env_file ]] && {
-        sed -i '' -e "s/default.env/${build_env_file}/g" $build_location/docker-compose.yml
+        sed -i '' -e 's|default.env|'${build_env_file}'|g' $build_location/docker-compose.yml
     }
 
     docker-compose -f $build_location/docker-compose.yml up
@@ -74,7 +74,7 @@ build () {
     prepareBuildLocation
 
     [[ ! -z $build_env_file ]] && {
-        sed -i '' -e "s/default.env/${build_env_file}/g" $build_location/docker-compose.yml
+        sed -i '' -e 's|default.env|'${build_env_file}'|g' $build_location/docker-compose.yml
     }
 
     docker-compose -f $build_location/docker-compose.yml up --build
