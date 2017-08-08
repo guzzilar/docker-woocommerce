@@ -9,4 +9,4 @@ services:
     volumes:
       - ./html:/var/www/html
     env_file:
-      - ../dev.env
+      - default.env
