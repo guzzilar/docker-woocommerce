@@ -9,8 +9,8 @@ ENV APACHE_PID_FILE /var/run/apache2.pid
 ENV APACHE_RUN_DIR /var/run/apache2
 ENV APACHE_LOCK_DIR /var/lock/apache2
 
-RUN echo "mysql-server mysql-server/root_password password root" | debconf-set-selections
-RUN echo "mysql-server mysql-server/root_password_again password root" | debconf-set-selections
+RUN echo "mysql-server-5.4 mysql-server/root_password password root" | debconf-set-selections
+RUN echo "mysql-server-5.4 mysql-server/root_password_again password root" | debconf-set-selections
 
 RUN apt-get update && apt-get install -y --force-yes \
     unzip \
